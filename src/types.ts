@@ -1,108 +1,50 @@
-// types.ts
-
 /**
- * Type representing additional context data that can be passed to mutations.
- * This allows passing arbitrary data to transformation functions for complex scenarios.
- *
- * @example
- * ```typescript
- * import { Extra } from 'mutant';
- *
- * const extra: Extra = {
- *   timezone: 'UTC',
- *   locale: 'en-US'
- * };
- * ```
+ * Represents additional data that can be passed to mutation functions
  */
 export type Extra = Record<string, unknown>
 
 /**
- * Arguments passed to mutation functions. This interface defines the structure
- * of parameters available to transformation functions.
- *
- * @typeParam From - The type of the source object being transformed
+ * Arguments passed to a mutation function
+ * @template From - The source type being mutated from
  */
 export interface MutateFnArgs<From> {
-  /** The complete source object being mutated */
+  /** The source entity being transformed */
   entity: From
-  /**
-   * Source property key if using direct property mapping.
-   * Only available when the schema rule includes a 'from' property.
-   */
+  /** Optional source property key */
   from?: keyof From
-  /**
-   * Additional context data passed to the mutation.
-   * Useful for providing external configuration or dependencies.
-   */
+  /** Optional extra data to assist with transformation */
   extra?: Extra
 }
 
 /**
- * Type definition for a mutation function that transforms data.
- * These functions receive the source entity and optional context data,
- * and return the transformed value.
- *
- * @typeParam From - The type of the source object being transformed
- *
- * @example
- * ```typescript
- * import { MutateFn } from 'mutant';
- *
- * const fullNameFn: MutateFn<Person> = ({ entity }) =>
- *   `${entity.firstName} ${entity.lastName}`;
- * ```
+ * Function that performs a custom transformation on a source entity
+ * @template From - The source type being mutated from
  */
 export type MutateFn<From> = (args: MutateFnArgs<From>) => unknown
 
 /**
- * Schema definition for a single property mutation.
- * Supports three forms of property transformation:
- * 1. Direct mapping from source to target property
- * 2. Custom function transformation
- * 3. Combined mapping and transformation
- *
- * @typeParam From - The type of the source object
- * @typeParam To - The type of the target object
- *
- * @example
- * ```typescript
- * import { Schema } from 'mutant';
- *
- * // Direct mapping
- * const directMapping: Schema<Source, Target> = {
- *   from: 'sourceField',
- *   to: 'targetField'
- * };
- *
- * // Custom function
- * const functionMapping: Schema<Source, Target> = {
- *   to: 'targetField',
- *   fn: ({ entity }) => transform(entity)
- * };
- *
- * // Combined mapping and function
- * const combinedMapping: Schema<Source, Target> = {
- *   from: 'sourceField',
- *   to: 'targetField',
- *   fn: ({ entity, from }) => transform(entity[from])
- * };
- * ```
+ * Defines how a property should be transformed from source to target type
+ * @template From - The source type being mutated from
+ * @template To - The target type being mutated to
  */
-export type Schema<From, To> = | {
-  /** Target property key in the output object */
+export type Schema<From, To> =
+  | {
+  /** Target property key */
   to: keyof To
-  /** Source property key in the input object */
+  /** Source property key for direct mapping */
   from: keyof From
-} | {
-  /** Target property key in the output object */
+}
+  | {
+  /** Target property key */
   to: keyof To
-  /** Transformation function to generate the target value */
+  /** Custom transformation function */
   fn: MutateFn<From>
-} | {
-  /** Target property key in the output object */
+}
+  | {
+  /** Target property key */
   to: keyof To
-  /** Source property key in the input object */
+  /** Source property key */
   from: keyof From
-  /** Optional transformation function to modify the mapped value */
+  /** Custom transformation function that receives the source property value */
   fn: MutateFn<From>
 }

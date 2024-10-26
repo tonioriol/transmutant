@@ -1,6 +1,6 @@
-# mutant
+# Mutant
 
-A lightweight and flexible TypeScript library for transforming data structures using declarative schemas.
+A lightweight TypeScript library for flexible object transformation with type safety.
 
 ## Installation
 
@@ -10,180 +10,138 @@ npm install mutant
 
 ## Features
 
-- 🚀 Transform objects from one shape to another using a simple schema
-- 💪 Full TypeScript support with strong type inference
-- 🛠️ Support for direct property mapping and custom transformation functions
+- 🔒 Type-safe transformations
+- 🎯 Direct property mapping
+- ⚡ Custom transformation functions
+- 🔄 Flexible schema definition
 - 📦 Zero dependencies
-- 🔍 Additional context data support for complex transformations
 
 ## Usage
 
-### Basic Example
+### Basic Property Mapping
 
 ```typescript
 import { mutate } from 'mutant';
 
-const schema = [
-  {
-    from: 'firstName',
-    to: 'givenName'
-  },
-  {
-    from: 'lastName',
-    to: 'familyName'
-  }
-];
+interface User {
+  firstName: string;
+  lastName: string;
+  age: number;
+}
 
-const source = {
-  firstName: 'John',
-  lastName: 'Doe'
-};
+interface UserDTO {
+  fullName: string;
+  yearOfBirth: number;
+}
 
-const result = mutate(schema, source);
-// Result: { givenName: 'John', familyName: 'Doe' }
-```
-
-### Custom Transformation Functions
-
-```typescript
 const schema = [
   {
     to: 'fullName',
     fn: ({ entity }) => `${entity.firstName} ${entity.lastName}`
   },
   {
-    from: 'age',
-    to: 'isAdult',
-    fn: ({ entity }) => entity.age >= 18
+    to: 'yearOfBirth',
+    fn: ({ entity }) => new Date().getFullYear() - entity.age
   }
 ];
 
-const source = {
+const user: User = {
   firstName: 'John',
   lastName: 'Doe',
-  age: 25
+  age: 30
 };
 
-const result = mutate(schema, source);
-// Result: { fullName: 'John Doe', isAdult: true }
+const userDTO = mutate<User, UserDTO>(schema, user);
+// Result: { fullName: 'John Doe', yearOfBirth: 1994 }
 ```
 
-### Using Extra Context
+### Direct Property Mapping
 
 ```typescript
+interface Source {
+  id: number;
+  name: string;
+}
+
+interface Target {
+  userId: number;
+  userName: string;
+}
+
+const schema = [
+  { from: 'id', to: 'userId' },
+  { from: 'name', to: 'userName' }
+];
+
+const source: Source = { id: 1, name: 'John' };
+const target = mutate<Source, Target>(schema, source);
+// Result: { userId: 1, userName: 'John' }
+```
+
+### Using Extra Data
+
+```typescript
+interface Product {
+  price: number;
+}
+
+interface PricedProduct {
+  finalPrice: number;
+}
+
 const schema = [
   {
-    to: 'greeting',
-    fn: ({ entity, extra }) =>
-      `${extra.greeting}, ${entity.firstName}!`
+    to: 'finalPrice',
+    fn: ({ entity, extra }) => entity.price * (1 + extra.taxRate)
   }
 ];
 
-const source = {
-  firstName: 'John'
-};
-
-const result = mutate(schema, source, { greeting: 'Hello' });
-// Result: { greeting: 'Hello, John!' }
+const product: Product = { price: 100 };
+const pricedProduct = mutate<Product, PricedProduct>(
+  schema,
+  product,
+  { taxRate: 0.2 }
+);
+// Result: { finalPrice: 120 }
 ```
 
 ## API Reference
 
-### `mutate<From, To, TExtra>(schema, entity, extra?)`
+### `mutate<From, To>(schema, entity, extra?)`
 
-The main function for transforming data structures.
+Transforms a source entity into a target type based on the provided schema.
 
 #### Parameters
 
-- `schema`: `Schema<From, To>[]` - Array of transformation rules
-- `entity`: `From` - Source object to transform
-- `extra?`: `Extra` - Optional additional context data
+- `schema`: Array of transformation rules defining how properties should be mapped or transformed
+- `entity`: Source entity to transform
+- `extra`: (Optional) Additional data to pass to transformation functions
 
-#### Returns
+#### Schema Options
 
-- `To` - Transformed object matching the target shape
-
-### Schema Types
-
-#### Direct Property Mapping
+1. Direct mapping:
 ```typescript
 {
-  from: keyof From;
-  to: keyof To;
+  to: keyof Target;
+  from: keyof Source;
 }
 ```
 
-#### Custom Transform Function
+2. Custom transformation:
 ```typescript
 {
-  to: keyof To;
-  fn: (args: MutateFnArgs<From>) => unknown;
+  to: keyof Target;
+  fn: (args: { entity: Source; extra?: Extra }) => unknown;
 }
 ```
 
-#### Combined Property Mapping and Transform
+3. Combined mapping and transformation:
 ```typescript
 {
-  from: keyof From;
-  to: keyof To;
-  fn: (args: MutateFnArgs<From>) => unknown;
+  to: keyof Target;
+  from: keyof Source;
+  fn: (args: { entity: Source; from?: keyof Source; extra?: Extra }) => unknown;
 }
-```
-
-### Types
-
-#### `MutateFnArgs<From>`
-
-Arguments passed to mutation functions:
-
-```typescript
-interface MutateFnArgs<From> {
-  /** Source object being mutated */
-  entity: From;
-  /** Source property key if using direct property mapping */
-  from?: keyof From;
-  /** Additional context data */
-  extra?: Extra;
-}
-```
-
-#### `Extra`
-
-Type for additional context data:
-
-```typescript
-type Extra = Record<string, unknown>
-```
-
-## Best Practices
-
-1. **Type Safety**: Always define your input and output types for better type inference:
-```typescript
-interface Source {
-  firstName: string;
-  lastName: string;
-}
-
-interface Target {
-  fullName: string;
-}
-
-const schema: Schema<Source, Target>[] = [/*...*/];
-```
-
-2. **Immutability**: The library maintains immutability by default. Each transformation creates a new object.
-
-3. **Modular Transformations**: Break down complex transformations into smaller, reusable functions:
-```typescript
-const formatName = ({ entity }: MutateFnArgs<Source>) =>
-  `${entity.firstName} ${entity.lastName}`;
-
-const schema = [
-  {
-    to: 'fullName',
-    fn: formatName
-  }
-];
 ```
 
 ## License
