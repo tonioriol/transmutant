@@ -1,0 +1,33 @@
+{
+  "name": "mutant",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm test && npm run build",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "transform",
+    "mutation",
+    "typescript",
+    "schema",
+    "mapping",
+    "dto",
+    "data-transformation"
+  ],
+  "author": "Toni Oriol <tonioriol@gmail.com> (http://tonioriol.com/)",
+  "license": "MIT",
+  "description": "Transform your data with the power of mutation 🧬",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  }
+}
