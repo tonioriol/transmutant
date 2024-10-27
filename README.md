@@ -92,7 +92,7 @@ interface PricedProduct {
 const schema = [
   {
     to: 'finalPrice',
-    fn: ({ source, extra }) => source.price * (1 + extra.taxRate)
+    fn: ({ source, extra }) => source.price * (1 + extra?.taxRate)
   }
 ];
 
@@ -132,15 +132,6 @@ Transmutes a source object into a target type based on the provided schema.
 {
   to: keyof Target;
   fn: (args: { source: Source; extra?: Extra }) => unknown;
-}
-```
-
-3. Combined mapping and transmutation:
-```typescript
-{
-  to: keyof Target;
-  from: keyof Source;
-  fn: (args: { source: Source; from?: keyof Source; extra?: Extra }) => unknown;
 }
 ```
 
