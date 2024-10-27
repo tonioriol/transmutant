@@ -37,11 +37,11 @@ interface UserDTO {
 const schema = [
   {
     to: 'fullName',
-    fn: ({ entity }) => `${entity.firstName} ${entity.lastName}`
+    fn: ({ source }) => `${source.firstName} ${source.lastName}`
   },
   {
     to: 'yearOfBirth',
-    fn: ({ entity }) => new Date().getFullYear() - entity.age
+    fn: ({ source }) => new Date().getFullYear() - source.age
   }
 ];
 
@@ -92,7 +92,7 @@ interface PricedProduct {
 const schema = [
   {
     to: 'finalPrice',
-    fn: ({ entity, extra }) => entity.price * (1 + extra.taxRate)
+    fn: ({ source, extra }) => source.price * (1 + extra.taxRate)
   }
 ];
 
@@ -107,14 +107,14 @@ const pricedProduct = mutate<Product, PricedProduct>(
 
 ## API Reference
 
-### `mutate<From, To>(schema, entity, extra?)`
+### `mutate<Source, Target>(schema, source, extra?)`
 
-Transforms a source entity into a target type based on the provided schema.
+Transforms a source source into a target type based on the provided schema.
 
 #### Parameters
 
 - `schema`: Array of transformation rules defining how properties should be mapped or transformed
-- `entity`: Source entity to transform
+- `source`: Source source to transform
 - `extra`: (Optional) Additional data to pass to transformation functions
 
 #### Schema Options
@@ -131,7 +131,7 @@ Transforms a source entity into a target type based on the provided schema.
 ```typescript
 {
   to: keyof Target;
-  fn: (args: { entity: Source; extra?: Extra }) => unknown;
+  fn: (args: { source: Source; extra?: Extra }) => unknown;
 }
 ```
 
@@ -140,7 +140,7 @@ Transforms a source entity into a target type based on the provided schema.
 {
   to: keyof Target;
   from: keyof Source;
-  fn: (args: { entity: Source; from?: keyof Source; extra?: Extra }) => unknown;
+  fn: (args: { source: Source; from?: keyof Source; extra?: Extra }) => unknown;
 }
 ```
 
