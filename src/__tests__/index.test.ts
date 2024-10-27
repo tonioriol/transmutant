@@ -1,4 +1,4 @@
-import { mutate, Schema } from '../'
+import { transmute, Schema } from '../'
 
 interface SourceUser {
   firstName: string
@@ -20,7 +20,7 @@ interface TargetUser {
   isAdult: boolean
 }
 
-describe('mutate', () => {
+describe('transmute', () => {
   const sourceUser: SourceUser = {
     firstName: 'John',
     lastName: 'Doe',
@@ -38,11 +38,11 @@ describe('mutate', () => {
       { from: 'email', to: 'contactEmail' }
     ]
 
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({ contactEmail: 'john.doe@example.com' })
   })
 
-  it('should handle custom transformation functions', () => {
+  it('should handle custom transmutation functions', () => {
     const schema: Schema<SourceUser, Pick<TargetUser, 'fullName'>>[] = [
       {
         to: 'fullName',
@@ -50,11 +50,11 @@ describe('mutate', () => {
       }
     ]
 
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({ fullName: 'John Doe' })
   })
 
-  it('should handle transformation with both "from" and "fn"', () => {
+  it('should handle transmutation with both "from" and "fn"', () => {
     const schema: Schema<SourceUser, Pick<TargetUser, 'userAge'>>[] = [
       {
         to: 'userAge',
@@ -62,11 +62,11 @@ describe('mutate', () => {
       }
     ]
 
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({ userAge: 26 })
   })
 
-  it('should handle extra data in transformations', () => {
+  it('should handle extra data in transmutations', () => {
     const schema: Schema<SourceUser, Pick<TargetUser, 'location'>>[] = [
       {
         to: 'location',
@@ -75,11 +75,11 @@ describe('mutate', () => {
       }
     ]
 
-    const result = mutate(schema, sourceUser, { separator: ' | ' })
+    const result = transmute(schema, sourceUser, { separator: ' | ' })
     expect(result).toEqual({ location: 'New York, USA | ' })
   })
 
-  it('should handle multiple transformations', () => {
+  it('should handle multiple transmutations', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
@@ -104,7 +104,7 @@ describe('mutate', () => {
       }
     ]
 
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({
       fullName: 'John Doe',
       userAge: 25,
@@ -114,7 +114,7 @@ describe('mutate', () => {
     })
   })
 
-  it('should set null for undefined transformations', () => {
+  it('should set null for undefined transmutations', () => {
     const schema: Schema<SourceUser, { optionalField: string }>[] = [
       {
         to: 'optionalField',
@@ -122,13 +122,13 @@ describe('mutate', () => {
       }
     ]
 
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({ optionalField: null })
   })
 
   it('should handle empty schema', () => {
     const schema: Schema<SourceUser, {}>[] = []
-    const result = mutate(schema, sourceUser)
+    const result = transmute(schema, sourceUser)
     expect(result).toEqual({})
   })
 
@@ -142,7 +142,7 @@ describe('mutate', () => {
       { from: 'email', to: 'contactEmail' }
     ]
 
-    const result = mutate(schema, sourceWithNull)
+    const result = transmute(schema, sourceWithNull)
     expect(result).toEqual({ contactEmail: null })
   })
 })

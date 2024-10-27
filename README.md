@@ -1,18 +1,18 @@
-# Mutant
+# Transmutant
 
-A lightweight TypeScript library for flexible object transformation with type safety.
+A lightweight TypeScript library for flexible object transmutation with type safety.
 
 ## Installation
 
 ```bash
-npm install mutant
+npm install transmutant
 ```
 
 ## Features
 
-- 🔒 Type-safe transformations
+- 🔒 Type-safe transmutations
 - 🎯 Direct property mapping
-- ⚡ Custom transformation functions
+- ⚡ Custom transmutation functions
 - 🔄 Flexible schema definition
 - 📦 Zero dependencies
 
@@ -21,7 +21,7 @@ npm install mutant
 ### Basic Property Mapping
 
 ```typescript
-import { mutate } from 'mutant';
+import { transmute } from 'transmutant';
 
 interface User {
   firstName: string;
@@ -51,7 +51,7 @@ const user: User = {
   age: 30
 };
 
-const userDTO = mutate<User, UserDTO>(schema, user);
+const userDTO = transmute<User, UserDTO>(schema, user);
 // Result: { fullName: 'John Doe', yearOfBirth: 1994 }
 ```
 
@@ -74,7 +74,7 @@ const schema = [
 ];
 
 const source: Source = { id: 1, name: 'John' };
-const target = mutate<Source, Target>(schema, source);
+const target = transmute<Source, Target>(schema, source);
 // Result: { userId: 1, userName: 'John' }
 ```
 
@@ -97,7 +97,7 @@ const schema = [
 ];
 
 const product: Product = { price: 100 };
-const pricedProduct = mutate<Product, PricedProduct>(
+const pricedProduct = transmute<Product, PricedProduct>(
   schema,
   product,
   { taxRate: 0.2 }
@@ -107,15 +107,15 @@ const pricedProduct = mutate<Product, PricedProduct>(
 
 ## API Reference
 
-### `mutate<Source, Target>(schema, source, extra?)`
+### `transmute<Source, Target>(schema, source, extra?)`
 
-Transforms a source source into a target type based on the provided schema.
+Transmutes a source object into a target type based on the provided schema.
 
 #### Parameters
 
-- `schema`: Array of transformation rules defining how properties should be mapped or transformed
-- `source`: Source source to transform
-- `extra`: (Optional) Additional data to pass to transformation functions
+- `schema`: Array of transmutation rules defining how properties should be transmuted
+- `source`: Source object to transmute
+- `extra`: (Optional) Additional data to pass to transmutation functions
 
 #### Schema Options
 
@@ -127,7 +127,7 @@ Transforms a source source into a target type based on the provided schema.
 }
 ```
 
-2. Custom transformation:
+2. Custom transmutation:
 ```typescript
 {
   to: keyof Target;
@@ -135,7 +135,7 @@ Transforms a source source into a target type based on the provided schema.
 }
 ```
 
-3. Combined mapping and transformation:
+3. Combined mapping and transmutation:
 ```typescript
 {
   to: keyof Target;
