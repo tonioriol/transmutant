@@ -8,6 +8,8 @@ name: release-please
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # Add this for better authentication handling
+  issues: write   # Add this for release notes/changelog
 
 jobs:
   release-please:
