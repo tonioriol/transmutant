@@ -3,6 +3,12 @@ on:
     branches:
       - main
 name: release-please
+
+# Add permissions block at the workflow level
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   release-please:
     runs-on: ubuntu-latest
