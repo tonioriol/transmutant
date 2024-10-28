@@ -18,96 +18,89 @@ npm install transmutant
 
 ## Usage
 
-### Basic Property Mapping
-
-```typescript
-import { transmute } from 'transmutant';
-
-interface User {
-  firstName: string;
-  lastName: string;
-  age: number;
-}
-
-interface UserDTO {
-  fullName: string;
-  yearOfBirth: number;
-}
-
-const schema = [
-  {
-    to: 'fullName',
-    fn: ({ source }) => `${source.firstName} ${source.lastName}`
-  },
-  {
-    to: 'yearOfBirth',
-    fn: ({ source }) => new Date().getFullYear() - source.age
-  }
-];
-
-const user: User = {
-  firstName: 'John',
-  lastName: 'Doe',
-  age: 30
-};
-
-const userDTO = transmute<User, UserDTO>(schema, user);
-// Result: { fullName: 'John Doe', yearOfBirth: 1994 }
-```
-
 ### Direct Property Mapping
 
 ```typescript
 interface Source {
-  id: number;
-  name: string;
+  email: string;
 }
 
 interface Target {
-  userId: number;
-  userName: string;
+  contactEmail: string;
 }
 
-const schema = [
-  { from: 'id', to: 'userId' },
-  { from: 'name', to: 'userName' }
+const schema: Schema<Source, Target>[] = [
+  { from: 'email', to: 'contactEmail' }
 ];
 
-const source: Source = { id: 1, name: 'John' };
-const target = transmute<Source, Target>(schema, source);
-// Result: { userId: 1, userName: 'John' }
+const source: Source = { email: 'john@example.com' };
+const target = transmute(schema, source);
+
+// Result: { contactEmail: 'john@example.com' }
+```
+
+### Using Custom Transmutation Functions
+
+```typescript
+interface Source {
+  firstName: string;
+  lastName: string;
+}
+
+interface Target {
+  fullName: string;
+}
+
+const schema: Schema<Source, Target>[] = [
+  {
+    to: 'fullName',
+    fn: ({ source }) => `${source.firstName} ${source.lastName}`
+  }
+];
+
+const source: Source = { firstName: 'John', lastName: 'Doe' };
+const target = transmute(schema, source);
+
+// Result: { fullName: 'John Doe' }
 ```
 
 ### Using Extra Data
 
 ```typescript
-interface Product {
-  price: number;
+interface Source {
+  city: string;
+  country: string;
 }
 
-interface PricedProduct {
-  finalPrice: number;
+interface Target {
+  location: string;
 }
 
-const schema = [
+interface Extra {
+  separator: string;
+}
+
+const schema: Schema<Source, Target, Extra>[] = [
   {
-    to: 'finalPrice',
-    fn: ({ source, extra }) => source.price * (1 + extra?.taxRate)
+    to: 'location',
+    fn: ({ source, extra }) =>
+      `${source.city}, ${source.country}${extra?.separator}`
   }
 ];
 
-const product: Product = { price: 100 };
-const pricedProduct = transmute<Product, PricedProduct>(
-  schema,
-  product,
-  { taxRate: 0.2 }
-);
-// Result: { finalPrice: 120 }
+const source: Source = {
+  city: 'New York',
+  country: 'USA'
+};
+
+const target = transmute(schema, source, { separator: ' | ' });
+
+// Result: { location: 'New York, USA | ' }
 ```
 
 ## API Reference
 
-### `transmute<Source, Target>(schema, source, extra?)`
+### `transmute(schema, source, extra?)`
 
 Transmutes a source object into a target type based on the provided schema.
 
@@ -117,23 +110,44 @@ Transmutes a source object into a target type based on the provided schema.
 - `source`: Source object to transmute
 - `extra`: (Optional) Additional data to pass to transmutation functions
 
-#### Schema Options
+#### Schema Types
 
-1. Direct mapping:
+Each schema entry must specify the target property and use either direct mapping OR a custom function:
+
 ```typescript
-{
+type Schema<Source, Target, TExtra> = {
+  /** Target property key */
   to: keyof Target;
-  from: keyof Source;
-}
+} & (
+  | {
+      /** Source property key for direct mapping */
+      from: keyof Source;
+      fn?: never;
+    }
+  | {
+      /** Custom transmutation function */
+      fn: TransmuteFn<Source, TExtra>;
+      from?: never;
+    }
+);
 ```
 
-2. Custom transmutation:
+The `TransmuteFn` type is defined as:
 ```typescript
-{
-  to: keyof Target;
-  fn: (args: { source: Source; extra?: Extra }) => unknown;
-}
+type TransmuteFn<Source, TExtra> = (args: {
+  source: Source;
+  extra?: TExtra;
+}) => unknown;
 ```
+
+#### Behavior Notes
+
+- Direct mapping uses the `from` property to copy values directly from source to target
+- Custom functions receive the entire source object and optional extra data
+- If a direct mapping property is undefined or null, it will be set to `null` in the target object
+- Empty schemas result in an empty object
+- Each schema entry must use either `from` OR `fn`, but not both
+- The schema is processed sequentially, with each rule contributing to the final object
 
 ## License
 
@@ -142,4 +156,3 @@ MIT
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-

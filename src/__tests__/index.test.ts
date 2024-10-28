@@ -34,7 +34,7 @@ describe('transmute', () => {
   }
 
   it('should perform direct property mapping', () => {
-    const schema: Schema<SourceUser, Pick<TargetUser, 'contactEmail'>>[] = [
+    const schema: Schema<SourceUser, TargetUser>[] = [
       { from: 'email', to: 'contactEmail' }
     ]
 
@@ -43,7 +43,7 @@ describe('transmute', () => {
   })
 
   it('should handle custom transmutation functions', () => {
-    const schema: Schema<SourceUser, Pick<TargetUser, 'fullName'>>[] = [
+    const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
         fn: ({ source }) => `${source.firstName} ${source.lastName}`
@@ -55,7 +55,7 @@ describe('transmute', () => {
   })
 
   it('should handle transmutation with both "from" and "fn"', () => {
-    const schema: Schema<SourceUser, Pick<TargetUser, 'userAge'>>[] = [
+    const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'userAge',
         fn: ({ source }) => source['age'] + 1
@@ -67,7 +67,10 @@ describe('transmute', () => {
   })
 
   it('should handle extra data in transmutations', () => {
-    const schema: Schema<SourceUser, Pick<TargetUser, 'location'>>[] = [
+    interface Extra {
+      'separator': string
+    }
+    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
       {
         to: 'location',
         fn: ({ source, extra }) =>

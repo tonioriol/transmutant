@@ -1,4 +1,4 @@
-import { Extra, Schema } from './types'
+import { Schema } from './types'
 
 export * from './types'
 
@@ -12,16 +12,15 @@ export * from './types'
  * @param extra - Optional extra data to pass to mutation functions
  * @returns Transmuted object matching Target type
  */
-export const transmute = <Source, Target, TExtra extends Extra = Extra>(
-  schema: Schema<Source, Target>[],
+export const transmute = <Source, Target, TExtra = unknown>(
+  schema: Schema<Source, Target, TExtra>[],
   source: Source,
   extra?: TExtra
 ): Target =>
   schema.reduce<Target>(
     (acc, { from, to, fn }) => ({
       ...acc,
-      [to]: fn ? fn({ source, from, extra }) : from && source[from] ? source[from] : null
+      [to]: fn ? fn({ source, extra }) : source[from] ?? null
     }),
     {} as Target
   )
-
