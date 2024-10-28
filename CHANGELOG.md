@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/tonioriol/transmutant/compare/v1.0.1...v2.0.0) (2024-10-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* made the usage of fn or `to` exclusive. So they can't used both at the same time now.
+
+### Features
+
+* improved type safety for extra param ([f8247b1](https://github.com/tonioriol/transmutant/commit/f8247b1f9b098cc23efec30caec798be72d72d6a))
+
 ## [1.0.1](https://github.com/tonioriol/transmutant/compare/v1.0.0...v1.0.1) (2024-10-27)
 
 
