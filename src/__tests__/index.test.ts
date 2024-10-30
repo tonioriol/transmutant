@@ -46,7 +46,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        fn: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) => `${source.firstName} ${source.lastName}`
       }
     ]
 
@@ -58,7 +58,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'userAge',
-        fn: ({ source }) => source['age'] + 1
+        from: ({ source }) => source['age'] + 1
       }
     ]
 
@@ -73,7 +73,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser, Extra>[] = [
       {
         to: 'location',
-        fn: ({ source, extra }) =>
+        from: ({ source, extra }) =>
           `${source.address.city}, ${source.address.country}${extra?.separator}`
       }
     ]
@@ -86,7 +86,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        fn: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) => `${source.firstName} ${source.lastName}`
       },
       {
         from: 'age',
@@ -98,12 +98,12 @@ describe('transmute', () => {
       },
       {
         to: 'location',
-        fn: ({ source }) =>
+        from: ({ source }) =>
           `${source.address.city}, ${source.address.country}`
       },
       {
         to: 'isAdult',
-        fn: ({ source }) => source.age >= 18
+        from: ({ source }) => source.age >= 18
       }
     ]
 

@@ -26,6 +26,14 @@
   "author": "Toni Oriol <tonioriol@gmail.com> (http://tonioriol.com/)",
   "license": "MIT",
   "description": "Powerful type transmutations for TypeScript 🧬",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonioriol/transmutant.git"
+  },
+  "homepage": "https://github.com/tonioriol/transmutant#readme",
+  "bugs": {
+    "url": "https://github.com/tonioriol/transmutant/issues"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
