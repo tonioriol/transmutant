@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/tonioriol/transmutant/compare/v2.0.0...v2.1.0) (2024-10-30)
+
+
+### Features
+
+* enforce strict return types in transformation functions ([389cbcd](https://github.com/tonioriol/transmutant/commit/389cbcd3754b8587c324e4fc6c24ff4ec573874f))
+
 ## [2.0.0](https://github.com/tonioriol/transmutant/compare/v1.0.1...v2.0.0) (2024-10-28)
 
 
