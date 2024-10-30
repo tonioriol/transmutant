@@ -18,9 +18,9 @@ export const transmute = <Source, Target, TExtra = unknown>(
   extra?: TExtra
 ): Target =>
   schema.reduce<Target>(
-    (acc, { from, to, fn }) => ({
+    (acc, { from, to }) => ({
       ...acc,
-      [to]: fn ? fn({ source, extra }) : source[from] ?? null
+      [to]: typeof from === 'function' ? from({ source, extra }) : source[from]
     }),
     {} as Target
   )

@@ -1,6 +1,20 @@
-# Transmutant
+# 🧬 Transmutant 🧬
 
-A lightweight TypeScript library for flexible object transmutation with type safety.
+A powerful, type-safe TypeScript library for transforming objects through flexible schema definitions.
+
+[![npm version](https://badge.fury.io/js/transmutant.svg)](https://www.npmjs.com/package/transmutant)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub issues](https://img.shields.io/github/issues/tonioriol/transmutant)](https://github.com/tonioriol/transmutant/issues)
+[![GitHub stars](https://img.shields.io/github/stars/tonioriol/transmutant)](https://github.com/tonioriol/transmutant/stargazers)
+
+## Features
+
+- 🔒 **Type-safe**: Full TypeScript support with strong type inference
+- 🎯 **Flexible mapping**: Direct property mapping or custom transformation functions
+- ⚡ **High performance**: Minimal overhead and zero dependencies
+- 🔄 **Extensible**: Support for custom transformation logic and external data
+- 📦 **Lightweight**: Zero dependencies, small bundle size
+- 🛠️ **Predictable**: Transparent handling of undefined values
 
 ## Installation
 
@@ -8,17 +22,69 @@ A lightweight TypeScript library for flexible object transmutation with type saf
 npm install transmutant
 ```
 
-## Features
+## Quick Start
 
-- 🔒 Type-safe transmutations
-- 🎯 Direct property mapping
-- ⚡ Custom transmutation functions
-- 🔄 Flexible schema definition
-- 📦 Zero dependencies
+```typescript
+import { transmute, Schema } from 'transmutant';
 
-## Usage
+// Source type
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
-### Direct Property Mapping
+// Target type
+interface UserDTO {
+  fullName: string;
+  contactEmail: string;
+}
+
+// Define transformation schema
+const schema: Schema<User, UserDTO>[] = [
+  {
+    to: 'fullName',
+    from: ({ source }) => `${source.firstName} ${source.lastName}`
+  },
+  {
+    from: 'email',
+    to: 'contactEmail'
+  }
+];
+
+// Transform the object
+const user: User = {
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@example.com'
+};
+
+const userDTO = transmute(schema, user);
+// Result: { fullName: 'John Doe', contactEmail: 'john@example.com' }
+```
+
+## Core Concepts
+
+### Schema Definition
+
+A schema is an array of transformation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transformation function that produces the correct type for that target property.
+
+```typescript
+type Schema<Source, Target, TExtra = unknown> = {
+  [TargetKey in keyof Target]: {
+    /** Target property key */
+    to: TargetKey
+    /** Source property key for direct mapping or a custom transformation function */
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+  }
+}[keyof Target]
+```
+
+### Transformation Types
+
+#### 1. Direct Property Mapping
+
+Map a property directly from source to target:
 
 ```typescript
 interface Source {
@@ -32,127 +98,230 @@ interface Target {
 const schema: Schema<Source, Target>[] = [
   { from: 'email', to: 'contactEmail' }
 ];
-
-const source: Source = { email: 'john@example.com' };
-const target = transmute(schema, source);
-
-// Result: { contactEmail: 'john@example.com' }
 ```
 
-### Using Custom Transmutation Functions
+#### 2. Custom Transformation Functions
+
+Transform properties using custom logic with type safety:
+
+```typescript
+interface Source {
+  age: number;
+}
+
+interface Target {
+  isAdult: boolean;
+}
+
+const schema: Schema<Source, Target>[] = [
+  {
+    to: 'isAdult',
+    from: ({ source }) => source.age >= 18
+  }
+];
+```
+
+#### 3. External Data Transformations
+
+Include additional context in transformations:
+
+```typescript
+interface Source {
+  price: number;
+}
+
+interface Target {
+  formattedPrice: string;
+}
+
+interface ExtraData {
+  currency: string;
+}
+
+const schema: Schema<Source, Target, ExtraData>[] = [
+  {
+    to: 'formattedPrice',
+    from: ({ source, extra }) =>
+      `${source.price.toFixed(2)} ${extra.currency}`
+  }
+];
+```
+
+### Handling Undefined Values
+
+When a source property doesn't exist or a transformation function returns undefined, the target property will remain undefined:
+
+```typescript
+interface Source {
+  existingField: string;
+}
+
+interface Target {
+  mappedField: string;
+  computedField: string;
+}
+
+const schema: Schema<Source, Target>[] = [
+  {
+    from: 'nonExistentField' as keyof Source,  // Property doesn't exist
+    to: 'mappedField'
+  },
+  {
+    to: 'computedField',
+    from: ({ source }) => undefined  // Transformation returns undefined
+  }
+];
+
+const result = transmute(schema, { existingField: 'value' });
+// Result: { mappedField: undefined, computedField: undefined }
+```
+
+This allows you to:
+- Distinguish between unset values (`undefined`) and explicitly set null values
+- Handle optional properties naturally
+- Process partial transformations as needed
+
+## API Reference
+
+### `transmute<Source, Target, TExtra = unknown>`
+
+Main transformation function.
+
+#### Parameters
+
+| Parameter | Type                               | Description                   |
+|-----------|------------------------------------|-------------------------------|
+| schema    | `Schema<Source, Target, TExtra>[]` | Array of transformation rules |
+| source    | `Source`                           | Source object to transform    |
+| extra?    | `TExtra`                           | Optional additional data      |
+
+#### Returns
+
+Returns an object of type `Target`.
+
+### Type Definitions
+
+```typescript
+/**
+ * Schema entry defining how a property should be transformed
+ */
+type Schema<Source, Target, TExtra = unknown> = {
+  [TargetKey in keyof Target]: {
+    /** Target property key */
+    to: TargetKey
+    /** Source property key for direct mapping or a custom transformation function */
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+  }
+}[keyof Target]
+
+/**
+ * Function that performs property transformation
+ */
+type TransmuteFn<Source, Target, TargetKey extends keyof Target, TExtra = unknown> =
+  (args: TransmuteFnArgs<Source, TExtra>) => Target[TargetKey]
+
+/**
+ * Arguments passed to transformation function
+ */
+type TransmuteFnArgs<Source, TExtra> = {
+  source: Source
+  extra?: TExtra
+}
+```
+
+### Type Safety Examples
 
 ```typescript
 interface Source {
   firstName: string;
   lastName: string;
+  age: number;
 }
 
 interface Target {
-  fullName: string;
+  fullName: string;    // TargetKey = 'fullName', type = string
+  isAdult: boolean;    // TargetKey = 'isAdult', type = boolean
 }
 
+// TypeScript enforces correct return types
 const schema: Schema<Source, Target>[] = [
   {
     to: 'fullName',
-    fn: ({ source }) => `${source.firstName} ${source.lastName}`
+    from: ({ source }) => `${source.firstName} ${source.lastName}`  // Must return string
+  },
+  {
+    to: 'isAdult',
+    from: ({ source }) => source.age >= 18  // Must return boolean
   }
 ];
 
-const source: Source = { firstName: 'John', lastName: 'Doe' };
-const target = transmute(schema, source);
+// Type error example:
+const invalidSchema: Schema<Source, Target>[] = [
+  {
+    to: 'isAdult',
+    from: ({ source }) => source.age  // Type error: number is not assignable to boolean
+  }
+];
+```
 
-// Result: { fullName: 'John Doe' }
+### Direct Property Mapping
+
+When using direct property mapping, TypeScript ensures type compatibility:
+
+```typescript
+interface Source {
+  email: string;
+  age: number;
+}
+
+interface Target {
+  contactEmail: string;
+  yearOfBirth: number;
+}
+
+const schema: Schema<Source, Target>[] = [
+  { from: 'email', to: 'contactEmail' },     // OK: string -> string
+  { from: 'age', to: 'yearOfBirth' }         // OK: number -> number
+];
 ```
 
 ### Using Extra Data
 
+Extra data is fully typed:
+
 ```typescript
+interface ExtraData {
+  currentYear: number;
+}
+
 interface Source {
-  city: string;
-  country: string;
+  age: number;
 }
 
 interface Target {
-  location: string;
+  yearOfBirth: number;
 }
 
-interface Extra {
-  separator: string;
-}
-
-const schema: Schema<Source, Target, Extra>[] = [
+const schema: Schema<Source, Target, ExtraData>[] = [
   {
-    to: 'location',
-    fn: ({ source, extra }) =>
-      `${source.city}, ${source.country}${extra?.separator}`
+    to: 'yearOfBirth',
+    from: ({ source, extra }) => extra.currentYear - source.age
   }
 ];
 
-const source: Source = {
-  city: 'New York',
-  country: 'USA'
-};
-
-const target = transmute(schema, source, { separator: ' | ' });
-
-// Result: { location: 'New York, USA | ' }
+const result = transmute(schema, { age: 25 }, { currentYear: 2024 });
 ```
-
-## API Reference
-
-### `transmute(schema, source, extra?)`
-
-Transmutes a source object into a target type based on the provided schema.
-
-#### Parameters
-
-- `schema`: Array of transmutation rules defining how properties should be transmuted
-- `source`: Source object to transmute
-- `extra`: (Optional) Additional data to pass to transmutation functions
-
-#### Schema Types
-
-Each schema entry must specify the target property and use either direct mapping OR a custom function:
-
-```typescript
-type Schema<Source, Target, TExtra> = {
-  /** Target property key */
-  to: keyof Target;
-} & (
-  | {
-      /** Source property key for direct mapping */
-      from: keyof Source;
-      fn?: never;
-    }
-  | {
-      /** Custom transmutation function */
-      fn: TransmuteFn<Source, TExtra>;
-      from?: never;
-    }
-);
-```
-
-The `TransmuteFn` type is defined as:
-```typescript
-type TransmuteFn<Source, TExtra> = (args: {
-  source: Source;
-  extra?: TExtra;
-}) => unknown;
-```
-
-#### Behavior Notes
-
-- Direct mapping uses the `from` property to copy values directly from source to target
-- Custom functions receive the entire source object and optional extra data
-- If a direct mapping property is undefined or null, it will be set to `null` in the target object
-- Empty schemas result in an empty object
-- Each schema entry must use either `from` OR `fn`, but not both
-- The schema is processed sequentially, with each rule contributing to the final object
-
-## License
-
-MIT
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Feel free to submit a Pull Request.
+
+## License
+
+MIT © Antoni Oriol
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by <a href="https://github.com/tonioriol">Antoni Oriol</a></sub>
+</div>

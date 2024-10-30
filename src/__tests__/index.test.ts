@@ -1,4 +1,4 @@
-import { transmute, Schema } from '../'
+import { Schema, transmute } from '../'
 
 interface SourceUser {
   firstName: string
@@ -46,7 +46,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        fn: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) => `${source.firstName} ${source.lastName}`
       }
     ]
 
@@ -58,7 +58,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'userAge',
-        fn: ({ source }) => source['age'] + 1
+        from: ({ source }) => source['age'] + 1
       }
     ]
 
@@ -70,10 +70,11 @@ describe('transmute', () => {
     interface Extra {
       'separator': string
     }
+
     const schema: Schema<SourceUser, TargetUser, Extra>[] = [
       {
         to: 'location',
-        fn: ({ source, extra }) =>
+        from: ({ source, extra }) =>
           `${source.address.city}, ${source.address.country}${extra?.separator}`
       }
     ]
@@ -86,7 +87,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        fn: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) => `${source.firstName} ${source.lastName}`
       },
       {
         from: 'age',
@@ -98,12 +99,12 @@ describe('transmute', () => {
       },
       {
         to: 'location',
-        fn: ({ source }) =>
+        from: ({ source }) =>
           `${source.address.city}, ${source.address.country}`
       },
       {
         to: 'isAdult',
-        fn: ({ source }) => source.age >= 18
+        from: ({ source }) => source.age >= 18
       }
     ]
 
@@ -117,7 +118,7 @@ describe('transmute', () => {
     })
   })
 
-  it('should set null for undefined transmutations', () => {
+  it('should keep undefined values as undefined', () => {
     const schema: Schema<SourceUser, { optionalField: string }>[] = [
       {
         to: 'optionalField',
@@ -126,7 +127,7 @@ describe('transmute', () => {
     ]
 
     const result = transmute(schema, sourceUser)
-    expect(result).toEqual({ optionalField: null })
+    expect(result).toEqual({ optionalField: undefined })
   })
 
   it('should handle empty schema', () => {
