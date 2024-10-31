@@ -70,12 +70,12 @@ const userDTO = transmute(schema, user);
 A schema is an array of transformation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transformation function that produces the correct type for that target property.
 
 ```typescript
-type Schema<Source, Target, TExtra = unknown> = {
+type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
     /** Source property key for direct mapping or a custom transformation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 ```
@@ -183,7 +183,7 @@ This allows you to:
 
 ## API Reference
 
-### `transmute<Source, Target, TExtra = unknown>`
+### `transmute<Source, Target, Extra = unknown>`
 
 Main transformation function.
 
@@ -191,9 +191,9 @@ Main transformation function.
 
 | Parameter | Type                               | Description                   |
 |-----------|------------------------------------|-------------------------------|
-| schema    | `Schema<Source, Target, TExtra>[]` | Array of transformation rules |
+| schema    | `Schema<Source, Target, Extra>[]` | Array of transformation rules |
 | source    | `Source`                           | Source object to transform    |
-| extra?    | `TExtra`                           | Optional additional data      |
+| extra?    | `Extra`                           | Optional additional data      |
 
 #### Returns
 
@@ -205,27 +205,27 @@ Returns an object of type `Target`.
 /**
  * Schema entry defining how a property should be transformed
  */
-type Schema<Source, Target, TExtra = unknown> = {
+type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
     /** Source property key for direct mapping or a custom transformation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 
 /**
  * Function that performs property transformation
  */
-type TransmuteFn<Source, Target, TargetKey extends keyof Target, TExtra = unknown> =
-  (args: TransmuteFnArgs<Source, TExtra>) => Target[TargetKey]
+type TransmuteFn<Source, Target, TargetKey extends keyof Target, Extra = unknown> =
+  (args: TransmuteFnArgs<Source, Extra>) => Target[TargetKey]
 
 /**
  * Arguments passed to transformation function
  */
-type TransmuteFnArgs<Source, TExtra> = {
+type TransmuteFnArgs<Source, Extra> = {
   source: Source
-  extra?: TExtra
+  extra?: Extra
 }
 ```
 

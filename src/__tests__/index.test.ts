@@ -18,6 +18,7 @@ interface TargetUser {
   contactEmail: string
   location: string
   isAdult: boolean
+  humanReadableAga: string
 }
 
 describe('transmute', () => {
@@ -35,7 +36,8 @@ describe('transmute', () => {
 
   it('should perform direct property mapping', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
-      { from: 'email', to: 'contactEmail' }
+      { from: 'email', to: 'contactEmail' },
+      { from: ({source})=> `${source.age + 1}`, to: 'humanReadableAga' }
     ]
 
     const result = transmute(schema, sourceUser)
@@ -74,8 +76,8 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser, Extra>[] = [
       {
         to: 'location',
-        from: ({ source, extra }) =>
-          `${source.address.city}, ${source.address.country}${extra?.separator}`
+        from: ({ source, extra: { separator } }) =>
+          `${source.address.city}, ${source.address.country}${separator}`
       }
     ]
 
@@ -87,7 +89,7 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        from: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source, extra: { separator } }) => `${source.firstName} ${separator} ${source.lastName}`
       },
       {
         from: 'age',
