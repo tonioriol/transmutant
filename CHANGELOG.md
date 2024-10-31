@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/tonioriol/transmutant/compare/v2.1.0...v3.0.0) (2024-10-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* Schema type now enforces strict type compatibility between source and target properties. Code with mismatched types in direct property mappings will need to be updated to use TransmuteFn for type conversion or fix the type mismatch.
+
+### Features
+
+* enforce type compatibility in schema mappings ([cc26b94](https://github.com/tonioriol/transmutant/commit/cc26b94886fcef6a71ab1436d0c9438cab46f7b6))
+
 ## [2.1.0](https://github.com/tonioriol/transmutant/compare/v2.0.0...v2.1.0) (2024-10-30)
 
 
