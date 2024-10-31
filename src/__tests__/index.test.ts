@@ -42,7 +42,7 @@ describe('transmute', () => {
     expect(result).toEqual({ contactEmail: 'john.doe@example.com' })
   })
 
-  it('should handle custom transmutation functions', () => {
+  it('should handle custom transmuter functions', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',

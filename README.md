@@ -10,7 +10,7 @@ A powerful, type-safe TypeScript library for transmuting objects through flexibl
 ## Features
 
 - 🔒 **Type-safe**: Full TypeScript support with strong type inference
-- 🎯 **Flexible mapping**: Direct property mapping or custom transmutation functions
+- 🎯 **Flexible mapping**: Direct property mapping or custom transmuter functions
 - ⚡ **High performance**: Minimal overhead and zero dependencies
 - 🔄 **Extensible**: Support for custom transmutation logic and external data
 - 📦 **Lightweight**: Zero dependencies, small bundle size
@@ -52,7 +52,7 @@ const schema: Schema<User, UserDTO>[] = [
   }
 ];
 
-// Transmut the object
+// Transmute the object
 const user: User = {
   firstName: 'John',
   lastName: 'Doe',
@@ -67,15 +67,15 @@ const userDTO = transmute(schema, user);
 
 ### Schema Definition
 
-A schema is an array of transmutation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transmutation function that produces the correct type for that target property.
+A schema is an array of transmutation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transmuter function that produces the correct type for that target property.
 
 ```typescript
 type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
-    /** Source property key for direct mapping or a custom transmutation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
+    /** Source property key for direct mapping or a custom transmuter function */
+    from: keyof Source | Transmuter<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 ```
@@ -100,7 +100,7 @@ const schema: Schema<Source, Target>[] = [
 ];
 ```
 
-#### 2. Custom Transmutation Functions
+#### 2. Custom Transmuter Functions
 
 Transmute properties using custom logic with type safety:
 
@@ -149,7 +149,7 @@ const schema: Schema<Source, Target, ExtraData>[] = [
 
 ### Handling Undefined Values
 
-When a source property doesn't exist or a transmutation function returns undefined, the target property will remain undefined:
+When a source property doesn't exist or a transmuter function returns undefined, the target property will remain undefined:
 
 ```typescript
 interface Source {
@@ -185,7 +185,7 @@ This allows you to:
 
 ### `transmute<Source, Target, Extra = unknown>`
 
-Main transmutation function.
+Main transmuter function.
 
 #### Parameters
 
@@ -209,21 +209,21 @@ type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
-    /** Source property key for direct mapping or a custom transmutation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
+    /** Source property key for direct mapping or a custom transmuter function */
+    from: keyof Source | Transmuter<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 
 /**
  * Function that performs property transmutation
  */
-type TransmuteFn<Source, Target, TargetKey extends keyof Target, Extra = unknown> =
-  (args: TransmuteFnArgs<Source, Extra>) => Target[TargetKey]
+type Transmuter<Source, Target, TargetKey extends keyof Target, Extra = unknown> =
+  (args: TransmuterArgs<Source, Extra>) => Target[TargetKey]
 
 /**
- * Arguments passed to transmutation function
+ * Arguments passed to transmuter function
  */
-type TransmuteFnArgs<Source, Extra> = {
+type TransmuterArgs<Source, Extra> = {
   source: Source
   extra?: Extra
 }

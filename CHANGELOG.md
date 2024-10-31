@@ -12,7 +12,7 @@
 
 ### ⚠ BREAKING CHANGES
 
-* Schema type now enforces strict type compatibility between source and target properties. Code with mismatched types in direct property mappings will need to be updated to use TransmuteFn for type conversion or fix the type mismatch.
+* Schema type now enforces strict type compatibility between source and target properties. Code with mismatched types in direct property mappings will need to be updated to use Transmuter for type conversion or fix the type mismatch.
 
 ### Features
 
@@ -23,7 +23,7 @@
 
 ### Features
 
-* enforce strict return types in transmutation functions ([bb575df](https://github.com/tonioriol/transmutant/commit/bb575dfd605934d76627867ed507567591c86317))
+* enforce strict return types in transmuter functions ([bb575df](https://github.com/tonioriol/transmutant/commit/bb575dfd605934d76627867ed507567591c86317))
 
 ## [2.0.0](https://github.com/tonioriol/transmutant/compare/v1.0.1...v2.0.0) (2024-10-28)
 
