@@ -3,12 +3,9 @@
  * @template Source - The source type being transmuted from
  * @template Extra - Type of additional data for transmutation
  */
-export type TransmuteFnArgs<Source, Extra> = {
-  /** The source object being transmuted */
-  source: Source
-  /** Optional extra data to assist with transmutation */
-  extra?: Extra
-}
+export type TransmuteFnArgs<Source, Extra> = Extra extends undefined | never
+  ? { source: Source }
+  : { source: Source; extra: Extra }
 
 /**
  * Function that performs a custom transmutation on a source object
@@ -33,11 +30,9 @@ type AssignableKeys<Source, Target, TargetKey extends keyof Target> = {
  * @template Target - The target type being transmuted to
  * @template Extra - Type of additional data for transmutation
  */
-export type Schema<Source, Target, Extra = unknown> = {
+export type Schema<Source, Target, Extra = undefined> = {
   [TargetKey in keyof Target]: {
-    /** Target property key */
     to: TargetKey
-    /** Source property key for direct mapping or a custom transmutation function */
     from: AssignableKeys<Source, Target, TargetKey> | TransmuteFn<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]

@@ -70,7 +70,7 @@ describe('transmute', () => {
       {
         to: 'location',
         from: ({ source, extra }) =>
-          `${source.address.city}, ${source.address.country}${extra?.separator}`
+          `${source.address.city}, ${source.address.country}${extra.separator}`
       }
     ]
 
