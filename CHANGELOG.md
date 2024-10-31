@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/tonioriol/transmutant/compare/v3.0.0...v3.1.0) (2024-10-31)
+
+
+### Features
+
+* **transmute:** infer transmuter extra param based on transmute call ([c83b1c0](https://github.com/tonioriol/transmutant/commit/c83b1c0260d9d37e5b4e20b2417179379949795a))
+
 ## [3.0.0](https://github.com/tonioriol/transmutant/compare/v2.1.0...v3.0.0) (2024-10-31)
 
 
