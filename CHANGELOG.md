@@ -5,7 +5,7 @@
 
 ### Features
 
-* enforce strict return types in transformation functions ([bb575df](https://github.com/tonioriol/transmutant/commit/bb575dfd605934d76627867ed507567591c86317))
+* enforce strict return types in transmutation functions ([bb575df](https://github.com/tonioriol/transmutant/commit/bb575dfd605934d76627867ed507567591c86317))
 
 ## [2.0.0](https://github.com/tonioriol/transmutant/compare/v1.0.1...v2.0.0) (2024-10-28)
 

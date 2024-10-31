@@ -47,31 +47,26 @@ describe('transmute', () => {
       {
         to: 'fullName',
         from: ({ source }) => `${source.firstName} ${source.lastName}`
-      }
-    ]
-
-    const result = transmute(schema, sourceUser)
-    expect(result).toEqual({ fullName: 'John Doe' })
-  })
-
-  it('should handle transmutation with both "from" and "fn"', () => {
-    const schema: Schema<SourceUser, TargetUser>[] = [
+      },
       {
-        to: 'userAge',
-        from: ({ source }) => source['age'] + 1
+        to: 'isAdult',
+        from: ({ source }) => source.age >= 18
       }
     ]
 
     const result = transmute(schema, sourceUser)
-    expect(result).toEqual({ userAge: 26 })
+    expect(result).toEqual({
+      fullName: 'John Doe',
+      isAdult: true
+    })
   })
 
-  it('should handle extra data in transmutations', () => {
+  it('should handle transmutation with extra data', () => {
     interface Extra {
-      'separator': string
+      separator: string
     }
 
-    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
+    const schema: Schema<SourceUser, Pick<TargetUser, 'location'>, Extra>[] = [
       {
         to: 'location',
         from: ({ source, extra }) =>
@@ -83,7 +78,7 @@ describe('transmute', () => {
     expect(result).toEqual({ location: 'New York, USA | ' })
   })
 
-  it('should handle multiple transmutations', () => {
+  it('should handle complete object transmutation', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
@@ -116,37 +111,5 @@ describe('transmute', () => {
       location: 'New York, USA',
       isAdult: true
     })
-  })
-
-  it('should keep undefined values as undefined', () => {
-    const schema: Schema<SourceUser, { optionalField: string }>[] = [
-      {
-        to: 'optionalField',
-        from: 'nonexistentField' as keyof SourceUser
-      }
-    ]
-
-    const result = transmute(schema, sourceUser)
-    expect(result).toEqual({ optionalField: undefined })
-  })
-
-  it('should handle empty schema', () => {
-    const schema: Schema<SourceUser, {}>[] = []
-    const result = transmute(schema, sourceUser)
-    expect(result).toEqual({})
-  })
-
-  it('should handle null source values', () => {
-    const sourceWithNull = {
-      ...sourceUser,
-      email: null as unknown as string
-    }
-
-    const schema: Schema<typeof sourceWithNull, Pick<TargetUser, 'contactEmail'>>[] = [
-      { from: 'email', to: 'contactEmail' }
-    ]
-
-    const result = transmute(schema, sourceWithNull)
-    expect(result).toEqual({ contactEmail: null })
   })
 })

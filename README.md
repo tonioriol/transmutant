@@ -1,6 +1,6 @@
 # 🧬 Transmutant 🧬
 
-A powerful, type-safe TypeScript library for transforming objects through flexible schema definitions.
+A powerful, type-safe TypeScript library for transmuting objects through flexible schema definitions.
 
 [![npm version](https://badge.fury.io/js/transmutant.svg)](https://www.npmjs.com/package/transmutant)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -10,9 +10,9 @@ A powerful, type-safe TypeScript library for transforming objects through flexib
 ## Features
 
 - 🔒 **Type-safe**: Full TypeScript support with strong type inference
-- 🎯 **Flexible mapping**: Direct property mapping or custom transformation functions
+- 🎯 **Flexible mapping**: Direct property mapping or custom transmutation functions
 - ⚡ **High performance**: Minimal overhead and zero dependencies
-- 🔄 **Extensible**: Support for custom transformation logic and external data
+- 🔄 **Extensible**: Support for custom transmutation logic and external data
 - 📦 **Lightweight**: Zero dependencies, small bundle size
 - 🛠️ **Predictable**: Transparent handling of undefined values
 
@@ -40,7 +40,7 @@ interface UserDTO {
   contactEmail: string;
 }
 
-// Define transformation schema
+// Define transmutation schema
 const schema: Schema<User, UserDTO>[] = [
   {
     to: 'fullName',
@@ -52,7 +52,7 @@ const schema: Schema<User, UserDTO>[] = [
   }
 ];
 
-// Transform the object
+// Transmut the object
 const user: User = {
   firstName: 'John',
   lastName: 'Doe',
@@ -67,20 +67,20 @@ const userDTO = transmute(schema, user);
 
 ### Schema Definition
 
-A schema is an array of transformation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transformation function that produces the correct type for that target property.
+A schema is an array of transmutation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transmutation function that produces the correct type for that target property.
 
 ```typescript
-type Schema<Source, Target, TExtra = unknown> = {
+type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
-    /** Source property key for direct mapping or a custom transformation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+    /** Source property key for direct mapping or a custom transmutation function */
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 ```
 
-### Transformation Types
+### Transmutation Types
 
 #### 1. Direct Property Mapping
 
@@ -100,9 +100,9 @@ const schema: Schema<Source, Target>[] = [
 ];
 ```
 
-#### 2. Custom Transformation Functions
+#### 2. Custom Transmutation Functions
 
-Transform properties using custom logic with type safety:
+Transmute properties using custom logic with type safety:
 
 ```typescript
 interface Source {
@@ -121,9 +121,9 @@ const schema: Schema<Source, Target>[] = [
 ];
 ```
 
-#### 3. External Data Transformations
+#### 3. External Data Transmutations
 
-Include additional context in transformations:
+Include additional context in transmutations:
 
 ```typescript
 interface Source {
@@ -149,7 +149,7 @@ const schema: Schema<Source, Target, ExtraData>[] = [
 
 ### Handling Undefined Values
 
-When a source property doesn't exist or a transformation function returns undefined, the target property will remain undefined:
+When a source property doesn't exist or a transmutation function returns undefined, the target property will remain undefined:
 
 ```typescript
 interface Source {
@@ -168,7 +168,7 @@ const schema: Schema<Source, Target>[] = [
   },
   {
     to: 'computedField',
-    from: ({ source }) => undefined  // Transformation returns undefined
+    from: ({ source }) => undefined  // Transmutation returns undefined
   }
 ];
 
@@ -179,21 +179,21 @@ const result = transmute(schema, { existingField: 'value' });
 This allows you to:
 - Distinguish between unset values (`undefined`) and explicitly set null values
 - Handle optional properties naturally
-- Process partial transformations as needed
+- Process partial transmutations as needed
 
 ## API Reference
 
-### `transmute<Source, Target, TExtra = unknown>`
+### `transmute<Source, Target, Extra = unknown>`
 
-Main transformation function.
+Main transmutation function.
 
 #### Parameters
 
-| Parameter | Type                               | Description                   |
-|-----------|------------------------------------|-------------------------------|
-| schema    | `Schema<Source, Target, TExtra>[]` | Array of transformation rules |
-| source    | `Source`                           | Source object to transform    |
-| extra?    | `TExtra`                           | Optional additional data      |
+| Parameter | Type                              | Description                  |
+|-----------|-----------------------------------|------------------------------|
+| schema    | `Schema<Source, Target, Extra>[]` | Array of transmutation rules |
+| source    | `Source`                          | Source object to transmut    |
+| extra?    | `Extra`                           | Optional additional data     |
 
 #### Returns
 
@@ -203,29 +203,29 @@ Returns an object of type `Target`.
 
 ```typescript
 /**
- * Schema entry defining how a property should be transformed
+ * Schema entry defining how a property should be transmuted
  */
-type Schema<Source, Target, TExtra = unknown> = {
+type Schema<Source, Target, Extra = unknown> = {
   [TargetKey in keyof Target]: {
     /** Target property key */
     to: TargetKey
-    /** Source property key for direct mapping or a custom transformation function */
-    from: keyof Source | TransmuteFn<Source, Target, TargetKey, TExtra>
+    /** Source property key for direct mapping or a custom transmutation function */
+    from: keyof Source | TransmuteFn<Source, Target, TargetKey, Extra>
   }
 }[keyof Target]
 
 /**
- * Function that performs property transformation
+ * Function that performs property transmutation
  */
-type TransmuteFn<Source, Target, TargetKey extends keyof Target, TExtra = unknown> =
-  (args: TransmuteFnArgs<Source, TExtra>) => Target[TargetKey]
+type TransmuteFn<Source, Target, TargetKey extends keyof Target, Extra = unknown> =
+  (args: TransmuteFnArgs<Source, Extra>) => Target[TargetKey]
 
 /**
- * Arguments passed to transformation function
+ * Arguments passed to transmutation function
  */
-type TransmuteFnArgs<Source, TExtra> = {
+type TransmuteFnArgs<Source, Extra> = {
   source: Source
-  extra?: TExtra
+  extra?: Extra
 }
 ```
 
