@@ -25,7 +25,7 @@ npm install transmutant
 ## Quick Start
 
 ```typescript
-import { transmute, Schema } from 'transmutant';
+import { Schema, transmute } from 'transmutant'
 
 // Source type
 interface User {
@@ -47,19 +47,19 @@ const schema: Schema<User, UserDTO>[] = [
     from: ({ source }) => `${source.firstName} ${source.lastName}`
   },
   {
-    from: 'email',
-    to: 'contactEmail'
+    to: 'contactEmail',
+    from: 'email'
   }
-];
+]
 
 // Transmute the object
 const user: User = {
   firstName: 'John',
   lastName: 'Doe',
   email: 'john@example.com'
-};
+}
 
-const userDTO = transmute(schema, user);
+const userDTO = transmute(schema, user)
 // Result: { fullName: 'John Doe', contactEmail: 'john@example.com' }
 ```
 
@@ -67,24 +67,24 @@ const userDTO = transmute(schema, user);
 
 ### Schema Definition
 
-A schema is an array of transmutation rules that define how properties should be mapped from the source to the target type. Each rule specifies the target property key and either a source property key for direct mapping or a transmuter function that produces the correct type for that target property.
+A schema is an array of transmutation rules that define how properties should be mapped from the source to the target
+type. Each rule specifies:
+
+- The target property key (`to`)
+- Either a source property key for direct mapping or a transmuter function (`from`)
 
 ```typescript
-type Schema<Source, Target, Extra = unknown> = {
-  [TargetKey in keyof Target]: {
-    /** Target property key */
-    to: TargetKey
-    /** Source property key for direct mapping or a custom transmuter function */
-    from: keyof Source | Transmuter<Source, Target, TargetKey, Extra>
-  }
-}[keyof Target]
+type Schema<Source, Target, Extra> = {
+  to: keyof Target,
+  from: keyof Source | Transmuter<Source, Target, Extra>
+}
 ```
 
 ### Transmutation Types
 
 #### 1. Direct Property Mapping
 
-Map a property directly from source to target:
+Map a property directly from source to target when types are compatible:
 
 ```typescript
 interface Source {
@@ -96,13 +96,13 @@ interface Target {
 }
 
 const schema: Schema<Source, Target>[] = [
-  { from: 'email', to: 'contactEmail' }
-];
+  { to: 'contactEmail', from: 'email' }
+]
 ```
 
 #### 2. Custom Transmuter Functions
 
-Transmute properties using custom logic with type safety:
+Transmute properties using custom logic with full type safety:
 
 ```typescript
 interface Source {
@@ -123,113 +123,82 @@ const schema: Schema<Source, Target>[] = [
 
 #### 3. External Data Transmutations
 
-Include additional context in transmutations:
+Include additional context in transmutations through the `extra` parameter:
 
 ```typescript
 interface Source {
-  price: number;
+  city: string;
+  country: string;
 }
 
 interface Target {
-  formattedPrice: string;
+  location: string;
 }
 
 interface ExtraData {
-  currency: string;
+  separator: string;
 }
 
 const schema: Schema<Source, Target, ExtraData>[] = [
   {
-    to: 'formattedPrice',
+    to: 'location',
     from: ({ source, extra }) =>
-      `${source.price.toFixed(2)} ${extra.currency}`
-  }
-];
-```
-
-### Handling Undefined Values
-
-When a source property doesn't exist or a transmuter function returns undefined, the target property will remain undefined:
-
-```typescript
-interface Source {
-  existingField: string;
-}
-
-interface Target {
-  mappedField: string;
-  computedField: string;
-}
-
-const schema: Schema<Source, Target>[] = [
-  {
-    from: 'nonExistentField' as keyof Source,  // Property doesn't exist
-    to: 'mappedField'
-  },
-  {
-    to: 'computedField',
-    from: ({ source }) => undefined  // Transmutation returns undefined
+      `${source.city}${extra.separator}${source.country}`
   }
 ];
 
-const result = transmute(schema, { existingField: 'value' });
-// Result: { mappedField: undefined, computedField: undefined }
+const result = transmute(schema,
+  { city: 'New York', country: 'USA' },
+  { separator: ', ' }
+);
+// Result: { location: 'New York, USA' }
 ```
-
-This allows you to:
-- Distinguish between unset values (`undefined`) and explicitly set null values
-- Handle optional properties naturally
-- Process partial transmutations as needed
 
 ## API Reference
 
-### `transmute<Source, Target, Extra = unknown>`
-
-Main transmuter function.
-
-#### Parameters
-
-| Parameter | Type                              | Description                  |
-|-----------|-----------------------------------|------------------------------|
-| schema    | `Schema<Source, Target, Extra>[]` | Array of transmutation rules |
-| source    | `Source`                          | Source object to transmut    |
-| extra?    | `Extra`                           | Optional additional data     |
-
-#### Returns
-
-Returns an object of type `Target`.
-
-### Type Definitions
+### Types
 
 ```typescript
-/**
- * Schema entry defining how a property should be transmuted
- */
-type Schema<Source, Target, Extra = unknown> = {
-  [TargetKey in keyof Target]: {
-    /** Target property key */
-    to: TargetKey
-    /** Source property key for direct mapping or a custom transmuter function */
-    from: keyof Source | Transmuter<Source, Target, TargetKey, Extra>
-  }
-}[keyof Target]
+// Arguments passed to a mutation function
+type TransmuterArgs<Source, Extra> = { source: Source, extra?: Extra }
 
-/**
- * Function that performs property transmutation
- */
-type Transmuter<Source, Target, TargetKey extends keyof Target, Extra = unknown> =
-  (args: TransmuterArgs<Source, Extra>) => Target[TargetKey]
+// Function that performs a custom transmutation
+type Transmuter<Source, Target, Extra> = (args: TransmuterArgs<Source, Extra>) => Target[keyof Target]
 
-/**
- * Arguments passed to transmuter function
- */
-type TransmuterArgs<Source, Extra> = {
-  source: Source
-  extra?: Extra
+// Defines how a property should be transmuted
+type Schema<Source, Target, Extra> = {
+  to: keyof Target,
+  from: keyof Source | Transmuter<Source, Target, Extra>
 }
 ```
 
+### transmute()
+
+Main function for performing object transmutations.
+
+```typescript
+function transmute<Source, Target, Extra>(
+  schema: Schema<Source, Target, Extra>[],
+  source: Source,
+  extra?: Extra
+): Target;
+```
+
+#### Parameters
+
+| Parameter | Type                              | Description                        |
+|-----------|-----------------------------------|------------------------------------|
+| schema    | `Schema<Source, Target, Extra>[]` | Array of transmutation rules       |
+| source    | `Source`                          | Source object to transmute         |
+| extra     | `Extra` (optional)                | Additional data for transmutations |
+
+#### Returns
+
+Returns an object of type `Target` with all specified transmutations applied.
+
 ### Type Safety Examples
+
+The library provides strong type checking for both direct mappings and custom transmutations:
 
 ```typescript
 interface Source {
@@ -239,77 +208,29 @@ interface Source {
 }
 
 interface Target {
-  fullName: string;    // TargetKey = 'fullName', type = string
-  isAdult: boolean;    // TargetKey = 'isAdult', type = boolean
+  fullName: string;
+  isAdult: boolean;
 }
 
-// TypeScript enforces correct return types
-const schema: Schema<Source, Target>[] = [
+// Correct usage - types match
+const validSchema: Schema<Source, Target>[] = [
   {
     to: 'fullName',
-    from: ({ source }) => `${source.firstName} ${source.lastName}`  // Must return string
+    from: ({ source }) => `${source.firstName} ${source.lastName}`  // Returns string
   },
   {
     to: 'isAdult',
-    from: ({ source }) => source.age >= 18  // Must return boolean
+    from: ({ source }) => source.age >= 18  // Returns boolean
   }
 ];
 
-// Type error example:
+// Type error - incorrect return type
 const invalidSchema: Schema<Source, Target>[] = [
   {
     to: 'isAdult',
-    from: ({ source }) => source.age  // Type error: number is not assignable to boolean
+    from: ({ source }) => source.age  // Error: number not assignable to boolean
   }
 ];
-```
-
-### Direct Property Mapping
-
-When using direct property mapping, TypeScript ensures type compatibility:
-
-```typescript
-interface Source {
-  email: string;
-  age: number;
-}
-
-interface Target {
-  contactEmail: string;
-  yearOfBirth: number;
-}
-
-const schema: Schema<Source, Target>[] = [
-  { from: 'email', to: 'contactEmail' },     // OK: string -> string
-  { from: 'age', to: 'yearOfBirth' }         // OK: number -> number
-];
-```
-
-### Using Extra Data
-
-Extra data is fully typed:
-
-```typescript
-interface ExtraData {
-  currentYear: number;
-}
-
-interface Source {
-  age: number;
-}
-
-interface Target {
-  yearOfBirth: number;
-}
-
-const schema: Schema<Source, Target, ExtraData>[] = [
-  {
-    to: 'yearOfBirth',
-    from: ({ source, extra }) => extra.currentYear - source.age
-  }
-];
-
-const result = transmute(schema, { age: 25 }, { currentYear: 2024 });
 ```
 
 ## Contributing

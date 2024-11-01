@@ -3,7 +3,7 @@
  * @template Source - The source type being transmuted from
  * @template Extra - Type of additional data for transmutation
  */
-export type TransmuterArgs<Source, Extra> = Extra extends undefined | never
+export type TransmuterArgs<Source, Extra> = Extra extends undefined
   ? { source: Source }
   : { source: Source; extra: Extra }
 
@@ -14,7 +14,7 @@ export type TransmuterArgs<Source, Extra> = Extra extends undefined | never
  * @template TargetKey - The specific key of the target property being set
  * @template Extra - Type of additional data for transmutation
  */
-export type Transmuter<Source, Target, TargetKey extends keyof Target, Extra> =
+export type Transmuter<Source, Target, TargetKey extends keyof Target, Extra = undefined> =
   (args: TransmuterArgs<Source, Extra>) => Target[TargetKey]
 
 /**

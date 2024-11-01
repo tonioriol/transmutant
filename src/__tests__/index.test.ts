@@ -35,7 +35,7 @@ describe('transmute', () => {
 
   it('should perform direct property mapping', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
-      { from: 'email', to: 'contactEmail' }
+      { to: 'contactEmail', from: 'email' }
     ]
 
     const result = transmute(schema, sourceUser)
@@ -46,11 +46,13 @@ describe('transmute', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        from: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) =>
+          `${source.firstName} ${source.lastName}`
       },
       {
         to: 'isAdult',
-        from: ({ source }) => source.age >= 18
+        from: ({ source }) =>
+          source.age >= 18
       }
     ]
 
@@ -61,36 +63,37 @@ describe('transmute', () => {
     })
   })
 
-  it('should handle transmutation with extra data', () => {
+  it('should handle transmutation with extra data when specified', () => {
     interface Extra {
       separator: string
     }
 
-    const schema: Schema<SourceUser, Pick<TargetUser, 'location'>, Extra>[] = [
+    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
       {
         to: 'location',
         from: ({ source, extra }) =>
-          `${source.address.city}, ${source.address.country}${extra.separator}`
+          `${source.address.city}${extra.separator}${source.address.country}`
       }
     ]
 
     const result = transmute(schema, sourceUser, { separator: ' | ' })
-    expect(result).toEqual({ location: 'New York, USA | ' })
+    expect(result).toEqual({ location: 'New York | USA' })
   })
 
   it('should handle complete object transmutation', () => {
     const schema: Schema<SourceUser, TargetUser>[] = [
       {
         to: 'fullName',
-        from: ({ source }) => `${source.firstName} ${source.lastName}`
+        from: ({ source }) =>
+          `${source.firstName} ${source.lastName}`
       },
       {
-        from: 'age',
-        to: 'userAge'
+        to: 'userAge',
+        from: 'age'
       },
       {
-        from: 'email',
-        to: 'contactEmail'
+        to: 'contactEmail',
+        from: 'email'
       },
       {
         to: 'location',
@@ -99,7 +102,8 @@ describe('transmute', () => {
       },
       {
         to: 'isAdult',
-        from: ({ source }) => source.age >= 18
+        from: ({ source }) =>
+          source.age >= 18
       }
     ]
 
@@ -111,5 +115,50 @@ describe('transmute', () => {
       location: 'New York, USA',
       isAdult: true
     })
+  })
+
+  it('should ensure type safety with extra data', () => {
+    interface Extra {
+      prefix: string
+    }
+
+    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
+      {
+        to: 'fullName',
+        from: ({ source, extra }) =>
+          `${extra.prefix} ${source.firstName} ${source.lastName}`
+      }
+    ]
+
+    const result = transmute(schema, sourceUser, { prefix: 'Mr.' })
+    expect(result).toEqual({ fullName: 'Mr. John Doe' })
+  })
+
+  it('should handle type inference correctly', () => {
+    const schema1 = [
+      {
+        to: 'fullName' as const,
+        from: ({ source }: { source: SourceUser }) =>
+          `${source.firstName} ${source.lastName}`
+      }
+    ]
+
+    interface Extra {
+      title: string
+    }
+
+    const schema2 = [
+      {
+        to: 'fullName' as const,
+        from: ({ source, extra }: { source: SourceUser; extra: Extra }) =>
+          `${extra.title} ${source.firstName} ${source.lastName}`
+      }
+    ]
+
+    const result1 = transmute(schema1, sourceUser)
+    const result2 = transmute(schema2, sourceUser, { title: 'Dr.' })
+
+    expect(result1).toEqual({ fullName: 'John Doe' })
+    expect(result2).toEqual({ fullName: 'Dr. John Doe' })
   })
 })

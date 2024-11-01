@@ -12,17 +12,23 @@ export * from './types'
  * @param extra - Optional extra data to pass to mutation functions
  * @returns Transmuted object matching Target type
  */
-export const transmute = <Source, Target, Extra>(
+export const transmute = <Source, Target, Extra = undefined>(
   schema: Schema<Source, Target, Extra>[],
   source: Source,
   extra?: Extra
 ): Target => {
   return schema.reduce<Target>(
     (acc, { from, to }) => {
-
       const isFunction = typeof from === 'function'
-      const extraData = extra ? { extra } : {}
-      const value = isFunction ? (from as Function)({ source, ...extraData }) : source[from]
+      // Only include extra in args if it's defined
+      const args: Extra extends undefined ? { source: Source } : { source: Source; extra: Extra } =
+        extra === undefined
+          ? { source }
+          : { source, extra } as any // Type assertion needed due to conditional type
+
+      const value = isFunction
+        ? (from as Function)(args)
+        : source[from]
 
       return {
         ...acc,
