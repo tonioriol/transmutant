@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/tonioriol/transmutant/compare/v3.1.0...v4.0.0) (2024-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **types:** Changed Extra type parameter default from unknown to undefined for better type inference and runtime behavior alignment.
+
+### Code Refactoring
+
+* **types:** switch Extra type parameter default to undefined ([83c5a56](https://github.com/tonioriol/transmutant/commit/83c5a563dc5ccd5d8e04d3f86e0dd139dae4a346))
+
 ## [3.1.0](https://github.com/tonioriol/transmutant/compare/v3.0.0...v3.1.0) (2024-10-31)
 
 
