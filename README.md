@@ -81,8 +81,8 @@ type Schema<Source, Target, Context> = {
 }[]
 ```
 
-Note: this is overly simplified for clarity. The actual type definition includes additional type constraints. Check
-the [API Reference] the full type definition [here](/src/types.ts). 
+Note: this is overly simplified for clarity. The actual type definition includes additional type constraints. Check the
+full type definition [here](/src/types.ts).
 
 ### Transmutation Types
 
