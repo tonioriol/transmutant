@@ -74,9 +74,9 @@ type. Each rule specifies:
 - Either a source property key for direct mapping or a transmuter function (`from`)
 
 ```typescript
-type Schema<Source, Target, Extra> = {
+type Schema<Source, Target, Context> = {
   to: keyof Target,
-  from: keyof Source | Transmuter<Source, Target, Extra>
+  from: keyof Source | Transmuter<Source, Target, Context>
 }
 ```
 
@@ -123,7 +123,7 @@ const schema: Schema<Source, Target>[] = [
 
 #### 3. External Data Transmutations
 
-Include additional context in transmutations through the `extra` parameter:
+Include additional context in transmutations through the `context` parameter:
 
 ```typescript
 interface Source {
@@ -135,15 +135,15 @@ interface Target {
   location: string;
 }
 
-interface ExtraData {
+interface ContextData {
   separator: string;
 }
 
-const schema: Schema<Source, Target, ExtraData>[] = [
+const schema: Schema<Source, Target, ContextData>[] = [
   {
     to: 'location',
-    from: ({ source, extra }) =>
-      `${source.city}${extra.separator}${source.country}`
+    from: ({ source, context }) =>
+      `${source.city}${context.separator}${source.country}`
   }
 ];
 
@@ -160,15 +160,15 @@ const result = transmute(schema,
 
 ```typescript
 // Arguments passed to a mutation function
-type TransmuterArgs<Source, Extra> = { source: Source, extra?: Extra }
+type TransmuterArgs<Source, Context> = { source: Source, context?: Context }
 
 // Function that performs a custom transmutation
-type Transmuter<Source, Target, Extra> = (args: TransmuterArgs<Source, Extra>) => Target[keyof Target]
+type Transmuter<Source, Target, Context> = (args: TransmuterArgs<Source, Context>) => Target[keyof Target]
 
 // Defines how a property should be transmuted
-type Schema<Source, Target, Extra> = {
+type Schema<Source, Target, Context> = {
   to: keyof Target,
-  from: keyof Source | Transmuter<Source, Target, Extra>
+  from: keyof Source | Transmuter<Source, Target, Context>
 }
 ```
 
@@ -177,20 +177,20 @@ type Schema<Source, Target, Extra> = {
 Main function for performing object transmutations.
 
 ```typescript
-function transmute<Source, Target, Extra>(
-  schema: Schema<Source, Target, Extra>[],
+function transmute<Source, Target, Context>(
+  schema: Schema<Source, Target, Context>[],
   source: Source,
-  extra?: Extra
+  context?: Context
 ): Target;
 ```
 
 #### Parameters
 
-| Parameter | Type                              | Description                        |
-|-----------|-----------------------------------|------------------------------------|
-| schema    | `Schema<Source, Target, Extra>[]` | Array of transmutation rules       |
-| source    | `Source`                          | Source object to transmute         |
-| extra     | `Extra` (optional)                | Additional data for transmutations |
+| Parameter | Type                                | Description                        |
+|-----------|-------------------------------------|------------------------------------|
+| schema    | `Schema<Source, Target, Context>[]` | Array of transmutation rules       |
+| source    | `Source`                            | Source object to transmute         |
+| context   | `Context` (optional)                | Additional data for transmutations |
 
 #### Returns
 

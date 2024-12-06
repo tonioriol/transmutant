@@ -16,7 +16,7 @@
 
 ### Features
 
-* **transmute:** infer transmuter extra param based on transmute call ([c83b1c0](https://github.com/tonioriol/transmutant/commit/c83b1c0260d9d37e5b4e20b2417179379949795a))
+* **transmute:** infer transmuter context param based on transmute call ([c83b1c0](https://github.com/tonioriol/transmutant/commit/c83b1c0260d9d37e5b4e20b2417179379949795a))
 
 ## [3.0.0](https://github.com/tonioriol/transmutant/compare/v2.1.0...v3.0.0) (2024-10-31)
 
@@ -45,7 +45,7 @@
 
 ### Features
 
-* improved type safety for extra param ([f8247b1](https://github.com/tonioriol/transmutant/commit/f8247b1f9b098cc23efec30caec798be72d72d6a))
+* improved type safety for context param ([f8247b1](https://github.com/tonioriol/transmutant/commit/f8247b1f9b098cc23efec30caec798be72d72d6a))
 
 ## [1.0.1](https://github.com/tonioriol/transmutant/compare/v1.0.0...v1.0.1) (2024-10-27)
 

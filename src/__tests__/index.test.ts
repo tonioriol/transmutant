@@ -63,16 +63,16 @@ describe('transmute', () => {
     })
   })
 
-  it('should handle transmutation with extra data when specified', () => {
-    interface Extra {
+  it('should handle transmutation with context data when specified', () => {
+    interface Context {
       separator: string
     }
 
-    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
+    const schema: Schema<SourceUser, TargetUser, Context>[] = [
       {
         to: 'location',
-        from: ({ source, extra }) =>
-          `${source.address.city}${extra.separator}${source.address.country}`
+        from: ({ source, context }) =>
+          `${source.address.city}${context.separator}${source.address.country}`
       }
     ]
 
@@ -117,16 +117,16 @@ describe('transmute', () => {
     })
   })
 
-  it('should ensure type safety with extra data', () => {
-    interface Extra {
+  it('should ensure type safety with context data', () => {
+    interface Context {
       prefix: string
     }
 
-    const schema: Schema<SourceUser, TargetUser, Extra>[] = [
+    const schema: Schema<SourceUser, TargetUser, Context>[] = [
       {
         to: 'fullName',
-        from: ({ source, extra }) =>
-          `${extra.prefix} ${source.firstName} ${source.lastName}`
+        from: ({ source, context }) =>
+          `${context.prefix} ${source.firstName} ${source.lastName}`
       }
     ]
 
@@ -143,15 +143,15 @@ describe('transmute', () => {
       }
     ]
 
-    interface Extra {
+    interface Context {
       title: string
     }
 
     const schema2 = [
       {
         to: 'fullName' as const,
-        from: ({ source, extra }: { source: SourceUser; extra: Extra }) =>
-          `${extra.title} ${source.firstName} ${source.lastName}`
+        from: ({ source, context }: { source: SourceUser; context: Context }) =>
+          `${context.title} ${source.firstName} ${source.lastName}`
       }
     ]
 
