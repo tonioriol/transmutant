@@ -30,9 +30,17 @@ type AssignableKeys<Source, Target, TargetKey extends keyof Target> = {
  * @template Target - The target type being transmuted to
  * @template Context - Type of additional data for transmutation
  */
-export type Schema<Source, Target, Context = undefined> = {
+type SchemaItem<Source, Target, Context = undefined> = {
   [TargetKey in keyof Target]: {
     to: TargetKey
     from: AssignableKeys<Source, Target, TargetKey> | Transmuter<Source, Target, TargetKey, Context>
   }
 }[keyof Target]
+
+/**
+ * Schema for transmuting an object from the Source type into the Target type
+ * @template Source - The source type being transmuted from
+ * @template Target - The target type being transmuted to
+ * @template Context - Type of additional data for transmutation
+ */
+export type Schema<Source, Target, Context = undefined> = SchemaItem<Source, Target, Context>[]

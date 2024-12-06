@@ -67,7 +67,8 @@ const userDTO = transmute(schema, user)
 
 ### Schema Definition
 
-A schema is an array of transmutation rules that define how properties should be mapped from the source to the target
+A schema is a collection of transmutation rules that define how properties should be mapped from the source to the
+target
 type. Each rule specifies:
 
 - The target property key (`to`)
@@ -77,8 +78,11 @@ type. Each rule specifies:
 type Schema<Source, Target, Context> = {
   to: keyof Target,
   from: keyof Source | Transmuter<Source, Target, Context>
-}
+}[]
 ```
+
+Note: this is overly simplified for clarity. The actual type definition includes additional type constraints. Check
+the [API Reference] the full type definition [here](/src/types.ts). 
 
 ### Transmutation Types
 
@@ -169,7 +173,7 @@ type Transmuter<Source, Target, Context> = (args: TransmuterArgs<Source, Context
 type Schema<Source, Target, Context> = {
   to: keyof Target,
   from: keyof Source | Transmuter<Source, Target, Context>
-}
+}[]
 ```
 
 ### transmute()

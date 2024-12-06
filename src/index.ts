@@ -13,7 +13,7 @@ export * from './types'
  * @returns Transmuted object matching Target type
  */
 export const transmute = <Source, Target, Context = undefined>(
-  schema: Schema<Source, Target, Context>[],
+  schema: Schema<Source, Target, Context>,
   source: Source,
   context?: Context
 ): Target => {

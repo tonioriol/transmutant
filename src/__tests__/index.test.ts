@@ -34,7 +34,7 @@ describe('transmute', () => {
   }
 
   it('should perform direct property mapping', () => {
-    const schema: Schema<SourceUser, TargetUser>[] = [
+    const schema: Schema<SourceUser, TargetUser> = [
       { to: 'contactEmail', from: 'email' }
     ]
 
@@ -43,7 +43,7 @@ describe('transmute', () => {
   })
 
   it('should handle custom transmuter functions', () => {
-    const schema: Schema<SourceUser, TargetUser>[] = [
+    const schema: Schema<SourceUser, TargetUser> = [
       {
         to: 'fullName',
         from: ({ source }) =>
@@ -68,7 +68,7 @@ describe('transmute', () => {
       separator: string
     }
 
-    const schema: Schema<SourceUser, TargetUser, Context>[] = [
+    const schema: Schema<SourceUser, TargetUser, Context> = [
       {
         to: 'location',
         from: ({ source, context }) =>
@@ -81,7 +81,7 @@ describe('transmute', () => {
   })
 
   it('should handle complete object transmutation', () => {
-    const schema: Schema<SourceUser, TargetUser>[] = [
+    const schema: Schema<SourceUser, TargetUser> = [
       {
         to: 'fullName',
         from: ({ source }) =>
@@ -122,7 +122,7 @@ describe('transmute', () => {
       prefix: string
     }
 
-    const schema: Schema<SourceUser, TargetUser, Context>[] = [
+    const schema: Schema<SourceUser, TargetUser, Context> = [
       {
         to: 'fullName',
         from: ({ source, context }) =>
