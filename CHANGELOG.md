@@ -1,5 +1,18 @@
 # Changelog
 
+## [6.0.0](https://github.com/tonioriol/transmutant/compare/v5.0.0...v6.0.0) (2024-12-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* Split Schema type definition into two separate types:
+    - SchemaItem: represents a single transformation rule
+    - Schema: represents an array of SchemaItems
+
+### Code Refactoring
+
+* split Schema type into SchemaItem and Schema ([08a9ac5](https://github.com/tonioriol/transmutant/commit/08a9ac57f1ddca1f81d61b3d6e4c69bb15872ba5))
+
 ## [5.0.0](https://github.com/tonioriol/transmutant/compare/v4.0.0...v5.0.0) (2024-12-06)
 
 
