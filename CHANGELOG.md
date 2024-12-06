@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/tonioriol/transmutant/compare/v4.0.0...v5.0.0) (2024-12-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* The `extra` parameter in transmute() and related types has been renamed to `context` to better reflect its purpose in providing contextual data for transmutations. This change affects the public API including type definitions, function parameters, and documentation.
+
+### Code Refactoring
+
+* rename extra parameter to context ([b8ca220](https://github.com/tonioriol/transmutant/commit/b8ca22055c50d76dedc96e080acc8d377e4fab0c))
+
 ## [4.0.0](https://github.com/tonioriol/transmutant/compare/v3.1.0...v4.0.0) (2024-11-01)
 
 
